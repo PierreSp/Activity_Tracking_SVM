@@ -38,20 +38,13 @@ def calc_net_acceleration_dcfree(x, y, z):
 
 def create_features(data, label):
     featuredict = {}  # Dict for all features
-    ds_d_type = data[label].dtype
-    ds_d_data = {n: data[label][n][0, 0] for n in ds_d_type.names}  # Extract data with colum names (x,y,z)
-    N = len(ds_d_data["x"])  # Total number of measurements
+    ds_type = data[label].dtype
+    ds_data = {n: data[label][n][0, 0] for n in ds_type.names}
+    N = len(ds_data["x"])  # Total number of measurements
     # Add features to dict
     featuredict["label"] = np.repeat(label, N)
-    featuredict["x_mean"] = calc_gravitation_components(ds_d_data["x"])
-    featuredict["y_mean"] = calc_gravitation_components(ds_d_data["y"])
-    featuredict["z_mean"] = calc_gravitation_components(ds_d_data["z"])
-    print(calc_net_acceleration_dcfree(ds_d_data["x"],ds_d_data["y"],ds_d_data["z"]))
-
-
-# Load data
-data_2016 = sio.loadmat('data2016.mat')
-mdata = data_2016["data"]
-mdtype = mdata.dtype
-ndata = {n: mdata[n][0, 0] for n in mdtype.names} # Extract data with colum names
-# Names are ['brushing', 'drinking', 'shoe', 'writing']
+    featuredict["x_mean"] = np.repeat(calc_gravitation_components(ds_data["x"]), N)
+    featuredict["y_mean"] = np.repeat(calc_gravitation_components(ds_data["y"]), N)
+    featuredict["z_mean"] = np.repeat(calc_gravitation_components(ds_data["z"]), N)
+    featuredict["net_acceleration_dc"] = calc_net_acceleration_dcfree(ds_data["x"], ds_data["x"], ds_data["x"])
+    return featuredict
