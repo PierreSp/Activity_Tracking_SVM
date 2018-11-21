@@ -17,6 +17,7 @@ def run_svm(data, label, reduction=False, test_rate=0.33):
     clf = svm.SVC(kernel="rbf", gamma="scale")
     y_pred = clf.fit(X_train, y_train).predict(X_test)
     _print_confusion_matrix(y_test, y_pred, np.unique(label.values))
+    return clf, X_test, y_test, y_pred
 
 
 def cross_validation_svm(data, label, kernel="rbf", gamma="scale", cv=5):
