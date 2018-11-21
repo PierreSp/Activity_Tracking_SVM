@@ -20,6 +20,20 @@ def run_svm(data, label, reduction=False, test_rate=0.33):
     return clf, X_test, y_test, y_pred
 
 
+def predict_svm(classifier, data_windowed, nb_points, T):
+    predicted_label_windowwise = classifier.predict(data_windowed)
+    # the point j belongs to the T windows: j-(T-1), ..., j
+    # majority vote: the label of a point is 1 if ceil(T/2) windows votes 1
+    # that means the sum/T >= 0.5, ie int(2*sum/T) = 1
+    predicted_label_pointwise = []
+    for k in range(T, len(data)):
+        su = np.sum(predicted_label_windowwise[k-T])
+        prediction_one_label = int(2*su/T)
+        predicted_label_pointwise.append(prediction_one_label)
+    return predicted_label_pointwise
+
+
+
 def cross_validation_svm(data, label, kernel="rbf", gamma="scale", cv=5):
     clf = svm.SVC(kernel=kernel, gamma=gamma)
     scores = cross_val_score(clf, data, label, cv=cv)
