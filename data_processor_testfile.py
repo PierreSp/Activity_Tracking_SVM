@@ -6,7 +6,8 @@ TIMEWINDOW = 20 * 128
 STEP = 128
 FREQUENCY = 128
 
-def energy25(r, freq):
+
+def _energy25(r, freq):
     N = len(r)
     R = np.abs(np.fft.fft(r.flatten()))**2
     R[0] = 0
@@ -18,7 +19,7 @@ def energy25(r, freq):
     return f25
 
 
-def energy75(r, freq):
+def _energy75(r, freq):
     N = len(r)
     R = np.abs(np.fft.fft(r.flatten()))**2
     R[0] = 0
@@ -30,29 +31,29 @@ def energy75(r, freq):
     return f75
 
 
-def rolling_skew(df, window, step):
+def _rolling_skew(df, window, step):
     rl_skew = df.loc[:, ["r"]].rolling(window=TIMEWINDOW).std()
     return rl_skew
 
 
-def rolling_std(df, window, step):
+def _rolling_std(df, window, step):
     rl_skew = df.loc[:, ["r"]].rolling(window=TIMEWINDOW).skew()
     return rl_skew
 
 
-def rolling_f75(df, window, step, freq):
+def _rolling_f75(df, window, step, freq):
     rl_f75 = df.loc[:, ["r"]].rolling(window=TIMEWINDOW).apply(
         lambda x: energy75(x, freq), raw=True)
     return rl_f75
 
 
-def rolling_f25(df, window, step, freq):
+def _rolling_f25(df, window, step, freq):
     rl_f25 = df.loc[:, ["r"]].rolling(window=TIMEWINDOW).apply(
         lambda x: energy25(x, freq), raw=True)
     return rl_f25
 
 
-def rolling_means(df, window, step):
+def _rolling_means(df, window, step):
     rl_means = df.loc[:, ["x", "y", "z"]].rolling(window=TIMEWINDOW).mean()
     return rl_means
 
@@ -66,15 +67,15 @@ def load_data(filename):
     r_value = np.sqrt(datadict["x"]**2 + datadict["y"]**2 + datadict["z"]**2)
     datadict["r"] = r_value - np.mean(r_value)
     df = pd.DataFrame.from_dict(datadict)
-    rl_means = rolling_means(df, TIMEWINDOW, STEP)
+    rl_means = _rolling_means(df, TIMEWINDOW, STEP)
     df_windows = pd.DataFrame({
         'gx': rl_means.x.values,
         'gy': rl_means.y.values,
         'gz': rl_means.z.values,
-        'std': rolling_std(df, TIMEWINDOW, STEP).r.values,
-        'skewness': rolling_skew(df, TIMEWINDOW, STEP).r.values,
-        'f25': rolling_f25(df, TIMEWINDOW, STEP, FREQUENCY).r.values,
-        'f75': rolling_f75(df, TIMEWINDOW, STEP, FREQUENCY).r.values,
+        'std': _rolling_std(df, TIMEWINDOW, STEP).r.values,
+        'skewness': _rolling_skew(df, TIMEWINDOW, STEP).r.values,
+        'f25': _rolling_f25(df, TIMEWINDOW, STEP, FREQUENCY).r.values,
+        'f75': _rolling_f75(df, TIMEWINDOW, STEP, FREQUENCY).r.values,
     })
     df_windows = df_windows.drop(range(TIMEWINDOW-1), axis=0)
     return df_windows
