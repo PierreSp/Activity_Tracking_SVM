@@ -104,13 +104,11 @@ def load_dataframe(filename):
     data['data'].dtype.names = [
         n if n!='shoelacing' else 'shoe' for n in data['data'].dtype.names
     ]
-
     gx, gy, gz = means(data)
     labels = get_labels(data)
     std = get_std(data)
     skewness = get_skewness(data)
     f25, f75 = get_energy(data)
-
 
     df = pd.DataFrame({
         'gx': gx,
@@ -124,23 +122,5 @@ def load_dataframe(filename):
     })
     return df
 
-
-def main():
-    _df1 = load_dataframe('data/data2016.mat')
-    _df1['shoe'] = _df1.label == 'shoe'
-    _df2 = load_dataframe('data/data2017.mat')
-    _df2['shoe'] = _df2.label == 'shoe'
-    _df3 = load_dataframe('data/data2018.mat')
-    _df3['shoe'] = _df3.label == 'shoe'
-
-    df = pd.concat((_df1, _df2, _df3))
-
-    _df1.to_csv('2016.csv')
-    _df2.to_csv('2017.csv')
-    _df3.to_csv('2018.csv')
-    df.to_csv('all.csv')
-
-
-
 if __name__ == '__main__':
-    main()
+    print("See jupyter script for an example of usage")
