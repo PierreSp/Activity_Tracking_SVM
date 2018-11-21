@@ -9,10 +9,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
-def run_svm(data, label, reduction=False, split=0.33):
+def run_svm(data, label, reduction=False, test_rate=0.33):
     if reduction:
         data = _dimension_reduction(data, method=reduction)
-    X_train, X_test, y_train, y_test = train_test_split(data, label)
+    X_train, X_test, y_train, y_test = train_test_split(data, label,
+                                                        test_size=test_rate)
     clf = svm.SVC(kernel="rbf", gamma="scale")
     y_pred = clf.fit(X_train, y_train).predict(X_test)
     _print_confusion_matrix(y_test, y_pred, np.unique(label.values))
@@ -24,11 +25,11 @@ def cross_validation_svm(data, label, kernel="rbf", gamma="scale", cv=5):
     print(f"Accuracy: {scores.mean()}(+/- {scores.std() * 2})")
 
 
-def _dimension_reduction(data, method="TLSE", ndim=2):
-    if method == "TLSE":
+def _dimension_reduction(data, method="TSNE", ndim=2):
+    if method == "TSNE":
         embedded_data = TSNE(n_components=ndim).fit_transform(data)
     elif method == "PCA":
-        embedded_data = PCA(n_components=ndim).fit(data)
+        embedded_data = PCA(n_components=ndim).fit_transform(data)
     else:
         print(f"Method {method} not available. Use TLSE instead")
         embedded_data = TSNE(n_components=ndim).fit_transform(data)
