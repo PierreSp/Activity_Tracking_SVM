@@ -32,29 +32,29 @@ def _energy75(r, freq):
 
 
 def _rolling_skew(df, window, step):
-    rl_skew = df.loc[:, ["r"]].rolling(window=TIMEWINDOW).std()
+    rl_skew = df.loc[:, ["r"]].rolling(window=window).std()
     return rl_skew
 
 
 def _rolling_std(df, window, step):
-    rl_skew = df.loc[:, ["r"]].rolling(window=TIMEWINDOW).skew()
+    rl_skew = df.loc[:, ["r"]].rolling(window=window).skew()
     return rl_skew
 
 
 def _rolling_f75(df, window, step, freq):
-    rl_f75 = df.loc[:, ["r"]].rolling(window=TIMEWINDOW).apply(
-        lambda x: energy75(x, freq), raw=True)
+    rl_f75 = df.loc[:, ["r"]].rolling(window=window).apply(
+        lambda x: _energy75(x, freq), raw=True)
     return rl_f75
 
 
 def _rolling_f25(df, window, step, freq):
-    rl_f25 = df.loc[:, ["r"]].rolling(window=TIMEWINDOW).apply(
-        lambda x: energy25(x, freq), raw=True)
+    rl_f25 = df.loc[:, ["r"]].rolling(window=window).apply(
+        lambda x: _energy25(x, freq), raw=True)
     return rl_f25
 
 
 def _rolling_means(df, window, step):
-    rl_means = df.loc[:, ["x", "y", "z"]].rolling(window=TIMEWINDOW).mean()
+    rl_means = df.loc[:, ["x", "y", "z"]].rolling(window=window).mean()
     return rl_means
 
 
@@ -77,5 +77,5 @@ def load_data(filename):
         'f25': _rolling_f25(df, TIMEWINDOW, STEP, FREQUENCY).r.values,
         'f75': _rolling_f75(df, TIMEWINDOW, STEP, FREQUENCY).r.values,
     })
-    df_windows = df_windows.drop(range(TIMEWINDOW-1), axis=0)
+    df_windows = df_windows.drop(range(TIMEWINDOW), axis=0)
     return df_windows
