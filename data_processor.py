@@ -8,7 +8,7 @@ ACTIVITIES = ['brushing', 'drinking', 'shoe', 'writing']
 FREQUENCY = 128
 
 
-def means(data):
+def calc_means(data):
     gx = []
     gy = []
     gz = []
@@ -74,17 +74,14 @@ def energy25_75(r, freq):
     frequencies = [i * freq / N for i in range(N)]
     CR = R.cumsum()
     CR /= CR.max()
-
     index = np.where(CR < 0.25/2)[0][-1]
     f25 = frequencies[index]
-
     index = np.where(CR < 0.75/2)[0][-1]
     f75 = frequencies[index]
-
     return f25, f75
 
 
-def get_energy(data):
+def calc_energy(data):
     f25 = []
     f75 = []
     for label in ACTIVITIES:
@@ -104,11 +101,11 @@ def load_dataframe(filename):
     data['data'].dtype.names = [
         n if n!='shoelacing' else 'shoe' for n in data['data'].dtype.names
     ]
-    gx, gy, gz = means(data)
+    gx, gy, gz = calc_means(data)
     labels = get_labels(data)
     std = get_std(data)
     skewness = get_skewness(data)
-    f25, f75 = get_energy(data)
+    f25, f75 = calc_energy(data)
 
     df = pd.DataFrame({
         'gx': gx,
