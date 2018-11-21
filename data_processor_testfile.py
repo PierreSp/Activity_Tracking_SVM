@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy.io import loadmat
 
-TIMEWINDOW = 20 * 128
+TIMEWINDOW = 20 * 128  + 1
 STEP = 128
 FREQUENCY = 128
 
@@ -78,4 +78,5 @@ def load_data(filename):
         'f75': _rolling_f75(df, TIMEWINDOW, STEP, FREQUENCY).r.values,
     })
     df_windows = df_windows.drop(range(TIMEWINDOW), axis=0)
-    return df_windows
+    labels = data["data"]["Label"][0][0].ravel() == 4
+    return labels, df_windows
