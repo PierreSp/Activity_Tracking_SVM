@@ -42,7 +42,7 @@ def predict_svm(classifier, data_windowed, nb_points, size_window, step):
     for k in range(nb_points):
         windows = point_belongs_to_windows(k, size_window, step)
         su = np.sum([predicted_label_windowwise[w] for w in windows])
-        prediction_one_label = int(2*su/T)
+        prediction_one_label = int(2*su/len(windows))
         predicted_label_pointwise.append(prediction_one_label)
     return predicted_label_pointwise
 
