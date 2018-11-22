@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy.io import loadmat
 
-TIMEWINDOW = 20 * 128  + 1
+TIMEWINDOW = 8 * 128  + 1
 STEP = 128
 FREQUENCY = 128
 
@@ -31,31 +31,31 @@ def _energy75(r, freq):
     return f75
 
 
-def _rolling_skew(df, window, step):
-    rl_skew = df.loc[:, ["r"]].rolling(window=window).std()
-    return rl_skew
-
-
 def _rolling_std(df, window, step):
+    rl_std = df.loc[:, ["r"]].rolling(window=window).std()
+    return rl_std[window::step]
+
+
+def _rolling_skew(df, window, step):
     rl_skew = df.loc[:, ["r"]].rolling(window=window).skew()
-    return rl_skew
+    return rl_skew[window::step]
 
 
 def _rolling_f75(df, window, step, freq):
     rl_f75 = df.loc[:, ["r"]].rolling(window=window).apply(
         lambda x: _energy75(x, freq), raw=True)
-    return rl_f75
+    return rl_f75[window::step]
 
 
 def _rolling_f25(df, window, step, freq):
     rl_f25 = df.loc[:, ["r"]].rolling(window=window).apply(
         lambda x: _energy25(x, freq), raw=True)
-    return rl_f25
+    return rl_f25[window::step]
 
 
 def _rolling_means(df, window, step):
     rl_means = df.loc[:, ["x", "y", "z"]].rolling(window=window).mean()
-    return rl_means
+    return rl_means[window::step]
 
 
 def load_data(filename):
@@ -77,6 +77,6 @@ def load_data(filename):
         'f25': _rolling_f25(df, TIMEWINDOW, STEP, FREQUENCY).r.values,
         'f75': _rolling_f75(df, TIMEWINDOW, STEP, FREQUENCY).r.values,
     })
-    df_windows = df_windows.drop(range(TIMEWINDOW), axis=0)
+    # df_windows = df_windows.drop(range(TIMEWINDOW), axis=0)
     labels = data["data"]["Label"][0][0].ravel() == 4
     return labels, df_windows
