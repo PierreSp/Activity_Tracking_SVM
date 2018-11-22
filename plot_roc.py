@@ -6,7 +6,7 @@ def plot_roc(clf_fited, data_windowed, real_labels):
     '''
     data: data whose labels are known
     '''
-    X_train, X_test, y_train, y_test = train_test_split(data, label,
+    X_train, X_test, y_train, y_test = train_test_split(data_windowed, label,
                                                         test_size=test_rate)
     n = len(real_labels)
     T = len(real_labels)-len(data_windowed)

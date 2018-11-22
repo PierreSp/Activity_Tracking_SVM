@@ -9,14 +9,17 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
-def run_svm(data, label, reduction=False, test_rate=0.33):
-    if reduction:
-        data = _dimension_reduction(data, method=reduction)
+
+def run_svm(data, label, plot=False, test_rate=0.33):
+    if plot:
+        data = _dimension_reduction(data)
     X_train, X_test, y_train, y_test = train_test_split(data, label,
                                                         test_size=test_rate)
     clf = svm.SVC(kernel="rbf", gamma="scale")
     y_pred = clf.fit(X_train, y_train).predict(X_test)
-    _print_confusion_matrix(y_test, y_pred, np.unique(label.values))
+    plot_svm_boundaries(clf, data, label)
+
+    _plot_confusion_matrix(y_test, y_pred, np.unique(label.values))
     return clf, X_test, y_test, y_pred
 
 
@@ -51,8 +54,8 @@ def _dimension_reduction(data, method="TSNE", ndim=2):
     return embedded_data
 
 
-def _print_confusion_matrix(y_test, y_pred, class_names,
-                            normalize=False, figsize=(10, 7), fontsize=30):
+def _plot_confusion_matrix(y_test, y_pred, class_names,
+                           normalize=False, figsize=(10, 7), fontsize=30):
     cm = confusion_matrix(y_test, y_pred)
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
@@ -69,3 +72,38 @@ def _print_confusion_matrix(y_test, y_pred, class_names,
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     print(fig)
+
+
+def _plot_svc_decision_function(model, ax=None, plot_support=True):
+    """Plot the decision function for a 2D SVC"""
+    if ax is None:
+        ax = plt.gca()
+    xlim = ax.get_xlim()
+    ylim = ax.get_ylim()
+
+    # create grid to evaluate model
+    x = np.linspace(xlim[0], xlim[1], 30)
+    y = np.linspace(ylim[0], ylim[1], 30)
+    Y, X = np.meshgrid(y, x)
+    xy = np.vstack([X.ravel(), Y.ravel()]).T
+    P = model.decision_function(xy).reshape(X.shape)
+
+    # plot decision boundary and margins
+    ax.contour(X, Y, P, colors='k',
+               levels=[-1, 0, 1], alpha=0.5,
+               linestyles=['--', '-', '--'])
+
+    # plot support vectors
+    if plot_support:
+        ax.scatter(model.support_vectors_[:, 0],
+                   model.support_vectors_[:, 1],
+                   s=300, linewidth=1, facecolors='none')
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
+
+
+def plot_svm_boundaries(clf, X, y):
+    plt.scatter(X[:, 0], X[:, 1], c=y, s=50, cmap='autumn')
+    _plot_svc_decision_function(clf)
+    plt.scatter(clf.support_vectors_[:, 0], clf.support_vectors_[:, 1],
+                s=300, lw=1, facecolors='none')
