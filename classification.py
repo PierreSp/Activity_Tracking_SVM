@@ -37,11 +37,11 @@ def predict_svm(classifier, data_windowed, nb_points, size_window, step):
     # the point j belongs to the  windows: j-(T-1), ..., j
     # majority vote: the label of a point is 1 if ceil(T/2) windows votes 1
     # that means the sum/T >= 0.5, ie int(2*sum/T) = 1
-    predicted_label_pointwise = [0 for k in range(size_window)]
+    predicted_label_pointwise = []
     # n_w: number of windows a point belongs to
-    for k in range(size_window, nb_points):
+    for k in range(nb_points):
         windows = point_belongs_to_windows(k, size_window, step)
-        su = np.sum([predicted_label_pointwise[w] for w in windows])
+        su = np.sum([predicted_label_windowwise[w] for w in windows])
         prediction_one_label = int(2*su/T)
         predicted_label_pointwise.append(prediction_one_label)
     return predicted_label_pointwise
