@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 from scipy.io import loadmat
 
-TIMEWINDOW = 8 * 128  + 1
-STEP = 128
+TIMEWINDOW = 800 + 1
+STEP = int(128)
 FREQUENCY = 128
 
 

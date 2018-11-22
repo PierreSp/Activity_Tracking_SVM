@@ -6,10 +6,11 @@ def plot_roc(clf_fited, data_windowed, real_labels):
     '''
     data: data whose labels are known
     '''
-    X_train, X_test, y_train, y_test = train_test_split(data_windowed, label,
-                                                        test_size=test_rate)
-    nb_points = len(real_labels)
-    y_score = predict_svm(clf_fited, data_windowed, n, nb_points, TIMEWINDOW, STEP)
+    X_train, X_test, y_train, y_test = train_test_split(data_windowed, real_labels,
+                                                        test_size=0.33)
+    n = len(real_labels)
+    T = len(real_labels)-len(data_windowed)
+    y_score = predict_svm(clf_fited, data_windowed, n, T)
     fpr, tpr, _ = roc_curve(y_test, y_score)
     roc_auc = auc(fpr, tpr)
 
