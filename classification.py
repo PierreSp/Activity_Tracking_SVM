@@ -20,18 +20,28 @@ def run_svm(data, label, reduction=False, test_rate=0.33):
     return clf, X_test, y_test, y_pred
 
 
-def predict_svm(classifier, data_windowed, nb_points, T):
+def point_belongs_to_windows(index, size_window, step):
+    n_w = int(size_window/  step)
+    last_window = int((index - size_window)/step)
+    first_window = max(0, last_window - n_w+1)
+    real_last_window = max(first_window, last_window)
+    windows = range(first_window, real_last_window)
+    return windows
+
+
+def predict_svm(classifier, data_windowed, nb_points, size_window, step):
     predicted_label_windowwise = classifier.predict(data_windowed)
-    # the point j belongs to the T windows: j-(T-1), ..., j
+    # the point j belongs to the  windows: j-(T-1), ..., j
     # majority vote: the label of a point is 1 if ceil(T/2) windows votes 1
     # that means the sum/T >= 0.5, ie int(2*sum/T) = 1
-    predicted_label_pointwise = []
-    for k in range(T, len(data)):
-        su = np.sum(predicted_label_windowwise[k-T])
+    predicted_label_pointwise = [0 for k in range(size_window)]
+    # n_w: number of windows a point belongs to
+    for k in range(size_window, nb_points):
+        windows = point_belongs_to_windows(k, size_window, step)
+        su = np.sum([predicted_label_pointwise[w] for w in windows])
         prediction_one_label = int(2*su/T)
         predicted_label_pointwise.append(prediction_one_label)
     return predicted_label_pointwise
-
 
 
 def cross_validation_svm(data, label, kernel="rbf", gamma="scale", cv=5):
