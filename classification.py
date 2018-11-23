@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
-
 def predict_svm(classifier, data_windowed, nb_points, size_window, step):
     predicted_label_windowwise = classifier.predict(data_windowed)
     # the point j belongs to the  windows: j-(T-1), ..., j
@@ -22,8 +21,8 @@ def predict_svm(classifier, data_windowed, nb_points, size_window, step):
         windows = point_belongs_to_windows(k, size_window, step)
         try:
             su = np.sum([predicted_label_windowwise[w] for w in windows])
-            prediction_one_label = min(1, int(2*su/len(windows)))
-        except:
+            prediction_one_label = int(min(1, int(17*su/len(windows))))
+        except Exception as ex:
             prediction_one_label = 0
         predicted_label_pointwise.append(prediction_one_label)
     return predicted_label_pointwise, predicted_label_windowwise
@@ -130,7 +129,7 @@ def _plot_svc_decision_function(model, ax=None, plot_support=True):
 
 
 def plot_svm_boundaries(clf, X, y):
-    plt.scatter(X[:, 0], X[:, 1], c=y, s=50, cmap='autumn', label=X[:, 1])
+    plt.scatter(X[:, 0], X[:, 1], c=y, s=100, cmap='Dark2', label=X[:, 1])
     _plot_svc_decision_function(clf)
     plt.scatter(clf.support_vectors_[:, 0], clf.support_vectors_[:, 1],
                 s=300, lw=1, facecolors='none')
