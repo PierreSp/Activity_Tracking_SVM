@@ -3,7 +3,6 @@ import pandas as pd
 from scipy.io import loadmat
 from scipy.stats import skew
 
-
 ACTIVITIES = ['brushing', 'drinking', 'shoe', 'writing']
 FREQUENCY = 128
 
@@ -34,9 +33,9 @@ def get_std(data):
 def get_skewness(data):
     out = []
     for label in ACTIVITIES:
-        activity_data = data['data'][label][0,0]
+        activity_data = data['data'][label][0, 0]
         for i in range(activity_data.shape[1]):
-            r = dimension_reduction(activity_data[0,i])
+            r = dimension_reduction(activity_data[0, i])
             out.append(skew(r)[0])
     return out
 
@@ -44,7 +43,7 @@ def get_skewness(data):
 def get_labels(data):
     labels = []
     for label in ACTIVITIES:
-        activity_data = data['data'][label][0,0]
+        activity_data = data['data'][label][0, 0]
         for i in range(activity_data.shape[1]):
             labels.append(label)
     return labels
@@ -59,7 +58,7 @@ def dimension_reduction(single_person_activity):
 def remove_dc(data):
     out = data
     for label in ACTIVITIES:
-        activity_data = out['data'][label][0,0]
+        activity_data = out['data'][label][0, 0]
         for i in range(activity_data.shape[1]):
             activity_data[0, i]['x'] -= activity_data[0, i]['x'].mean()
             activity_data[0, i]['y'] -= activity_data[0, i]['y'].mean()
@@ -85,7 +84,7 @@ def calc_energy(data):
     f25 = []
     f75 = []
     for label in ACTIVITIES:
-        activity_data = data['data'][label][0 ,0]
+        activity_data = data['data'][label][0, 0]
         for i in range(activity_data.shape[1]):
             r = dimension_reduction(activity_data[0, i])
             r = r-r.mean()
@@ -97,7 +96,6 @@ def calc_energy(data):
 
 def load_dataframe(filename):
     data = loadmat(filename)
-    acnames = data['data'].dtype.names
     data['data'].dtype.names = [
         n if n!='shoelacing' else 'shoe' for n in data['data'].dtype.names
     ]
@@ -118,6 +116,7 @@ def load_dataframe(filename):
         'label': labels,
     })
     return df
+
 
 if __name__ == '__main__':
     print("See jupyter script for an example of usage")
